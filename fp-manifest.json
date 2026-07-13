@@ -1,0 +1,16 @@
+{
+  "name": "Fabbrica-Progetti · AccessibilityToAll",
+  "short_name": "Fabbrica",
+  "description": "Da un'idea a un progetto pronto al lancio, ovunque tu sia.",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#0C6CD3",
+  "theme_color": "#0C6CD3",
+  "lang": "it",
+  "icons": [
+    { "src": "./fp-icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "./fp-icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+  ]
+}

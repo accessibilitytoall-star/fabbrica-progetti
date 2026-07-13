@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Fabbrica-Progetti · AccessibilityToAll</title>
+<meta name="theme-color" content="#0C6CD3">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Fabbrica">
+<link rel="manifest" href="fp-manifest.json">
+<link rel="apple-touch-icon" href="fp-icon-180.png">
+<style>
+  :root{--blu:#0C6CD3;--blu-scuro:#0a4f9c;--blu-notte:#083a73;--arancio:#EF8216;--grigio:#95A5A6;--bordo:#c5d6ec;--chiaro:#eef4fb;--testo:#14243b;}
+  *{box-sizing:border-box}
+  html,body{margin:0}
+  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;color:var(--testo);background:#f4f7fb;line-height:1.5;padding-bottom:5rem;}
+  header.app{background:var(--blu-scuro);color:#fff;padding:1rem 1.1rem;position:sticky;top:0;z-index:5;}
+  header.app h1{font-size:1.15rem;margin:0;display:flex;align-items:center;gap:.4rem;}
+  .wrap{max-width:760px;margin:0 auto;padding:1rem;}
+  button{font:inherit;cursor:pointer;border:2px solid transparent;border-radius:10px;font-weight:700;}
+  .btn-primary{background:var(--arancio);color:#3d2200;padding:.9rem 1.2rem;font-size:1.1rem;width:100%;}
+  .btn-primary:hover{background:#d9740f}
+  .btn-ghost{background:#fff;color:var(--blu-scuro);border-color:var(--blu);padding:.55rem 1rem;}
+  .btn-mini{padding:.3rem .6rem;font-size:.85rem}
+  .card{background:#fff;border:1px solid var(--bordo);border-radius:14px;padding:1rem 1.1rem;margin:.8rem 0;box-shadow:0 3px 12px rgba(8,58,115,.07);}
+  .proj-head{display:flex;justify-content:space-between;align-items:center;gap:.6rem;}
+  .proj-name{font-weight:800;color:var(--blu-scuro);font-size:1.05rem;}
+  .bar{height:9px;background:#dbe7f5;border-radius:999px;overflow:hidden;margin:.5rem 0;}
+  .bar>span{display:block;height:100%;background:var(--arancio);width:0;transition:width .3s;}
+  .muted{color:#3f5a80;font-size:.9rem;}
+  .next{background:var(--chiaro);border-left:5px solid var(--blu);border-radius:8px;padding:.5rem .6rem;margin:.4rem 0;font-size:.9rem;color:var(--blu-notte);display:flex;justify-content:space-between;align-items:center;gap:.5rem}
+  .stats{display:flex;gap:.6rem;margin-bottom:.4rem}
+  .stat{flex:1;background:#fff;border:1px solid var(--bordo);border-radius:12px;padding:.6rem;text-align:center}
+  .stat b{display:block;font-size:1.4rem;color:var(--blu-scuro)}
+  .area-h{color:var(--blu-scuro);font-weight:800;margin:1.1rem 0 .3rem;font-size:1rem;border-left:5px solid var(--arancio);padding-left:.5rem;}
+  .phase{border:1px solid var(--bordo);border-radius:10px;margin:.4rem 0;background:#fff;overflow:hidden;}
+  .phase.target{border-color:var(--arancio);box-shadow:0 0 0 2px rgba(239,130,22,.25)}
+  .phase-top{display:flex;align-items:center;gap:.5rem;padding:.6rem .7rem;}
+  .phase-top .t{font-weight:700;flex:1;}
+  .phase-top .tn{background:var(--blu-scuro);color:#fff;border-radius:7px;padding:.1rem .5rem;font-size:.78rem;font-weight:800;}
+  .chip{border:none;border-radius:999px;padding:.25rem .6rem;font-size:.78rem;font-weight:800;cursor:pointer;}
+  .todo{background:#eef1f4;color:#5b6b7d}.doing{background:#fff3e0;color:#9a5b00}.done{background:#dcebfb;color:var(--blu-notte)}
+  .agent-tag{font-size:.72rem;color:#3f5a80;}
+  .form{padding:0 .7rem .7rem;display:none;}.form.open{display:block}
+  label{display:block;font-weight:700;color:var(--blu-scuro);margin:.6rem 0 .2rem;font-size:.9rem;}
+  textarea,input[type=text],input[type=date],input[type=search]{width:100%;border:2px solid var(--bordo);border-radius:9px;padding:.5rem;font:inherit;}
+  textarea{min-height:2.6rem}
+  textarea:focus,button:focus-visible,.chip:focus-visible,input:focus{outline:3px solid #ffcf8f;outline-offset:2px;}
+  .ex{color:#8aa0bd;font-size:.8rem;font-style:italic;margin-top:.15rem;}
+  nav.tabs{position:fixed;bottom:0;left:0;right:0;background:#fff;border-top:1px solid var(--bordo);display:flex;z-index:6;padding-bottom:env(safe-area-inset-bottom);}
+  nav.tabs button{flex:1;background:none;border:none;border-radius:0;padding:.7rem;color:#5b6b7d;font-weight:700;font-size:.85rem;}
+  nav.tabs button.active{color:var(--blu-scuro);box-shadow:inset 0 3px 0 var(--arancio);}
+  .wizard .q{font-size:1.25rem;color:var(--blu-notte);margin:.3rem 0 .8rem;}
+  .step-label{color:var(--blu-scuro);font-weight:800;}
+  .foot{display:flex;justify-content:space-between;gap:.6rem;margin-top:1rem;}
+  .agent-card{display:flex;gap:.7rem;align-items:flex-start;}
+  .avatar{width:44px;height:44px;border-radius:50%;background:var(--blu);color:#fff;display:flex;align-items:center;justify-content:center;font-size:1.3rem;flex:0 0 44px;}
+  .lampo{background:linear-gradient(135deg,var(--arancio),#ffb15e);border-radius:14px;padding:1rem;margin:.4rem 0 1rem;}
+  .lampo label{color:#3d2200;font-size:1rem;margin-top:0}.lampo textarea{border-color:#e79a4d}
+  .warn{background:#fff3e0;border:1px solid #f2c98a;color:#9a5b00;border-radius:10px;padding:.6rem .8rem;margin:.6rem 0;font-size:.9rem}
+  .scad{background:#fff;border:1px solid var(--bordo);border-left:5px solid var(--arancio);border-radius:10px;padding:.5rem .8rem;margin:.3rem 0;font-size:.9rem}
+  .scad.overdue{border-left-color:#c0392b;color:#9a3025}
+  a{color:var(--blu-scuro);font-weight:700}
+  @media print{nav.tabs,header.app,.btn-ghost,.btn-primary,.chip{display:none!important}.wrap{padding:0}}
+</style>
+</head>
+<body>
+<header class="app"><h1>🏭 Fabbrica-Progetti</h1></header>
+<div class="wrap" id="main"></div>
+
+<nav class="tabs" role="tablist">
+  <button id="tab-idee" class="active" onclick="go('idee')">💡 Idee</button>
+  <button id="tab-mappa" onclick="go('mappa')">🗺️ Mappa</button>
+  <button id="tab-info" onclick="go('info')">ℹ️ Info</button>
+</nav>
+
+<script>
+const AREAS=[
+ ["① Innesco",["T0"]],["② Validazione",["T1","T2","T3"]],["③ Concept",["T4","T5","T6"]],
+ ["④ Numeri",["T7","T8"]],["⑤ Marketing & Ads",["T9","T10","TA"]],["⑥ Social & contenuti",["T11","T12"]],
+ ["⑦ Ricerca fondi",["T13","T14","T15","T16"]],["⑧ Kit di lancio",["T17","T18","T19"]],["⑨ Misura",["T20"]]
+];
+const PH={
+ T0:{n:"Innesco",e:"🚦",ag:"Pico",f:[["Idea in una frase","un podcast che spiega l'accessibilità alle PMI"],["Tipo di progetto","podcast"],["Vincoli (budget, tempi)","budget contenuto, 1° episodio in 2 mesi"]]},
+ T1:{n:"Validazione",e:"✅",ag:"Pico",f:[["Problema e per chi","le PMI non capiscono gli obblighi EAA"],["Prove del bisogno","forum, ricerche in aumento"],["Verdetto","vale la pena / da rivedere / no"]]},
+ T2:{n:"Analisi mercato",e:"📊",ag:"Mira",f:[["Grandezza e trend","4,4 mln PMI, in crescita"],["Pain point reali","«non so da dove iniziare»"]]},
+ T3:{n:"Analisi competitor",e:"🕵️",ag:"Argo",f:[["Competitor + debolezza","Studio X: legale ma non pratico"],["Angolo di differenziazione","semplice e umano"]]},
+ T4:{n:"Persona target",e:"🎯",ag:"Pico",f:[["Chi è","titolare e-commerce, poco tempo"],["Bisogni e obiezioni","a norma senza impazzire; «costa»"]]},
+ T5:{n:"Value proposition",e:"💎",ag:"Pico",f:[["Promessa in una frase","a norma EAA senza gergo, umana"],["3 motivi","chiarezza, concretezza, fiducia"]]},
+ T6:{n:"Naming & brand",e:"🏷️",ag:"Pico",f:[["Nome + tagline","EAAsy — accessibilità semplice"],["Tono e palette","caldo; A2A blu/arancio"]]},
+ T7:{n:"Business model",e:"🧩",ag:"Pico",f:[["Chi paga e come","PMI; abbonamento + consulenza"],["Risorse e attività","competenza EAA; episodi+audit"]]},
+ T8:{n:"Budget & numeri",e:"💰",ag:"Pico",f:[["Costi (avvio+ricorrenti)","dato da inserire"],["Ricavi e break-even","dato da calcolare"]]},
+ T9:{n:"Piano marketing",e:"📣",ag:"Pico",f:[["Canali e messaggi","IG+newsletter; a norma senza stress"],["Primi 90 giorni","M1 lancio, M2 lista, M3 clienti"]]},
+ T10:{n:"Landing / vetrina",e:"🖥️",ag:"Pico",f:[["Struttura (hero, prove, CTA)","promessa + testimonianze + call"],["Form + consenso","email + spunta GDPR"]]},
+ TA:{n:"Campagne Facebook",e:"💹",ag:"Ada",f:[["Obiettivo e pubblico","lead PMI Veneto"],["Budget e durata","10€/gg × 14 gg"],["Valutazione: ROAS, costo/lead + semaforo","🔵 buono · 🟡 medio · 🔴 scarso"]]},
+ T11:{n:"Piano social (organico)",e:"📅",ag:"Pico",f:[["Rubriche e cadenza","Lo sapevi? · 3 post/sett"],["Canali","Instagram, LinkedIn"]]},
+ T12:{n:"Contenuti di lancio",e:"✍️",ag:"Pico",f:[["Post di annuncio","«È nato il podcast che…»"],["Email di lancio","oggetto + corpo"]]},
+ T13:{n:"Ricerca fondi",e:"💶",ag:"Fedra",f:[["Bando (ente, scadenza, importo)","Regione X · 30/09 · 20k€"],["Crowdfunding / investitori","Produzioni dal Basso"]]},
+ T14:{n:"Domanda bando",e:"📝",ag:"Fedra",f:[["Progetto e obiettivi","podcast + guide; N PMI"],["Impatto accessibilità","alza la cultura EAA"]]},
+ T15:{n:"Pitch deck",e:"🎤",ag:"Pico",f:[["Problema → soluzione","EAA non capito → podcast"],["Mercato, numeri, richiesta","da T2/T8"]]},
+ T16:{n:"Piano partnership",e:"🤝",ag:"Pico",f:[["Partner + angolo","agenzia web: audit ai clienti"],["Sponsor / co-marketing","webinar congiunto"]]},
+ T17:{n:"Roadmap",e:"🗺️",ag:"Pico",f:[["Milestone 1 (cosa, entro, chi)","1° episodio · 30/08 · Beatrice"],["Milestone 2","landing · 15/08"]]},
+ T18:{n:"Piano PR",e:"📰",ag:"Pico",f:[["Angolo giornalistico","1° podcast EAA per PMI"],["Comunicato + media","titolo + testate"]]},
+ T19:{n:"Kit di lancio",e:"🎁",ag:"Pico",f:[["Cosa c'è / cosa manca","manca il pitch"],["Pronto al lancio?","sì/no + cosa serve"]]},
+ T20:{n:"KPI & rischi",e:"📈",ag:"Pico",f:[["KPI + obiettivo","download/episodio · 500"],["Rischi + prossima revisione","poco tempo → tra 30 gg"]]}
+};
+const AGENTS=[
+ ["🏭","Pico","Agente Progetto — sa tutto, coordina e parla con te e con Aria"],
+ ["🔎","Mira","Agente Mercato — dimensione, trend, VOC (T2)"],
+ ["🕵️","Argo","Agente Competitor — concorrenti e spazio libero (T3)"],
+ ["💶","Fedra","Agente Fondi — bandi, crowdfunding, investitori (T13-14)"],
+ ["📇","Lia","Agente Lead — contatti con consenso"],
+ ["💹","Ada","Agente Ads — pianifica e valuta le campagne Facebook/Meta (TA)"]
+];
+
+const KEY="fabbrica_progetti_v2";
+function loadP(){try{return JSON.parse(localStorage.getItem(KEY))||[]}catch(e){return[]}}
+let quotaFull=false;
+function save(p){try{localStorage.setItem(KEY,JSON.stringify(p));quotaFull=false;}catch(e){quotaFull=true;alert("⚠️ Memoria piena. Vai in Info → «Esporta backup», poi archivia qualche progetto: l'ultima modifica potrebbe non essere stata salvata.");}}
+function usagePct(){try{return Math.min(100,Math.round((localStorage.getItem(KEY)||"").length/(5*1024*1024)*100));}catch(e){return 0;}}
+let projects=loadP();
+let view="idee", current=null, wiz=null, q="", openTarget=null;
+const g=id=>document.getElementById(id);
+const esc=s=>(s||"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const allPh=()=>Object.keys(PH);
+function progress(p){const t=allPh().length;const d=allPh().filter(k=>(p.status||{})[k]==="done").length;return Math.round(d/t*100);}
+function nextTn(p){for(const [a,phs] of AREAS){for(const tn of phs){if((p.status||{})[tn]!=="done")return tn;}}return null;}
+function nextLabel(p){const tn=nextTn(p);return tn?PH[tn].e+" "+tn+" · "+PH[tn].n+" (agente: "+PH[tn].ag+")":"🎉 Completato";}
+function daysTo(d){if(!d)return null;const ms=new Date(d+"T00:00:00")-new Date(new Date().toDateString());return Math.round(ms/86400000);}
+
+function go(v){view=v;current=null;wiz=null;["idee","mappa","info"].forEach(t=>g("tab-"+t).classList.toggle("active",t===v));render();}
+function render(){const m=g("main");
+ if(wiz!==null){m.innerHTML=wizardHTML();const w=g("wq");if(w)w.focus();return;}
+ if(current){m.innerHTML=projectHTML(current);if(openTarget){const el=g("f-"+openTarget);if(el){el.classList.add("open");const ph=el.closest(".phase");if(ph){ph.classList.add("target");ph.scrollIntoView({block:"center"});}}openTarget=null;}return;}
+ if(view==="idee")m.innerHTML=ideeHTML();else if(view==="mappa")m.innerHTML=mappaHTML();else m.innerHTML=infoHTML();
+}
+
+function ideeHTML(){
+ let h=`<div class="lampo"><label for="lampo">💡 Idea lampo (5 secondi)</label>
+  <textarea id="lampo" placeholder="Scrivi o detta l'idea… la sviluppi con calma dopo"></textarea>
+  <button class="btn-primary" style="margin-top:.5rem" onclick="ideaLampo()">Salva idea ⚡</button></div>
+  <button class="btn-ghost" style="width:100%" onclick="startWiz()">＋ Nuova idea (wizard completo)</button>`;
+ if(usagePct()>80)h+=`<div class="warn">⚠️ Memoria quasi piena (${usagePct()}%). Esporta un backup (Info) e archivia i progetti vecchi.</div>`;
+ // scadenze vicine
+ const sc=projects.filter(p=>p.scadenza).map(p=>({p,d:daysTo(p.scadenza)})).filter(x=>x.d!==null&&x.d<=30).sort((a,b)=>a.d-b.d);
+ if(sc.length){h+=`<div class="area-h">⏰ Scadenze vicine</div>`;sc.forEach(({p,d})=>{h+=`<div class="scad ${d<0?'overdue':''}">📌 ${esc(p.name)} — ${d<0?('in ritardo di '+(-d)+' gg'):(d===0?'oggi!':'tra '+d+' gg')} (${esc(p.scadenza)})</div>`;});}
+ if(projects.length){const avg=Math.round(projects.reduce((s,p)=>s+progress(p),0)/projects.length);
+  h+=`<div class="stats" style="margin-top:1rem"><div class="stat"><b>${projects.length}</b>progetti</div><div class="stat"><b>${avg}%</b>medio</div></div>`;
+  if(projects.length>3)h+=`<input type="search" placeholder="🔎 Cerca progetto…" value="${esc(q)}" oninput="q=this.value;render()" aria-label="Cerca progetto">`;
+ } else h+=`<p class="muted" style="margin-top:1rem">Nessun progetto ancora. Scrivi un'idea lampo per partire.</p>`;
+ const list=projects.filter(p=>!q||(p.name+" "+((p.answers&&p.answers.T0&&p.answers.T0[0])||"")).toLowerCase().includes(q.toLowerCase()));
+ list.forEach(p=>{const i=projects.indexOf(p);const pr=progress(p);
+  h+=`<div class="card"><div class="proj-head"><span class="proj-name">🏭 ${esc(p.name)}</span>
+   <span><button class="btn-ghost btn-mini" onclick="dupProject('${p.id}')" title="Duplica">⧉</button> <button class="btn-ghost btn-mini" onclick="open_(${i})">Apri</button></span></div>
+  <div class="bar"><span style="width:${pr}%"></span></div>
+  <div class="next"><span>👉 Prossima: ${esc(nextLabel(p))}</span></div>
+  <div class="muted">${pr}% · creato ${esc(p.created)}</div></div>`;});
+ return h;
+}
+function open_(i){current=projects[i];render();}
+
+function projectHTML(p){const pr=progress(p);const tn=nextTn(p);
+ let h=`<button class="btn-ghost btn-mini" onclick="backHome()">← Idee</button>
+ <div class="card"><div class="proj-head"><span class="proj-name">🏭 ${esc(p.name)}</span>
+   <span><button class="btn-ghost btn-mini" onclick="dupProject('${p.id}')" title="Duplica">⧉</button> <button class="btn-ghost btn-mini" onclick="shareProject()">📤</button> <button class="btn-ghost btn-mini" onclick="window.print()">🖨️</button></span></div>
+ <div class="bar"><span style="width:${pr}%"></span></div>
+ <div class="next"><span>👉 Prossima: ${esc(nextLabel(p))}</span>${tn?`<button class="btn-ghost btn-mini" onclick="openStamp('${tn}')">Vai</button>`:''}</div>
+ <label for="scad">⏰ Scadenza (facoltativa)</label><input type="date" id="scad" value="${esc(p.scadenza||'')}" onchange="setScad(this.value)">
+ <div class="muted" style="margin-top:.4rem">${pr}% completato</div></div>`;
+ AREAS.forEach(([area,phs])=>{h+=`<div class="area-h">${area}</div>`;
+  phs.forEach(tn=>{const ph=PH[tn];const st=(p.status||{})[tn]||"todo";
+   h+=`<div class="phase"><div class="phase-top"><span class="tn">${tn}</span>
+   <span class="t">${ph.e} ${ph.n}<div class="agent-tag">agente: ${ph.ag}</div></span>
+   <button class="chip ${st}" onclick="cycle('${tn}')">${st==='todo'?'da fare':st==='doing'?'in corso':'fatto'}</button>
+   <button class="btn-ghost btn-mini" onclick="toggleForm('${tn}')">✎</button></div>
+   <div class="form" id="f-${tn}">${formHTML(p,tn)}</div></div>`;});
+ });
+ return h;
+}
+function formHTML(p,tn){const ph=PH[tn];const ans=(p.answers||{})[tn]||{};let h="";
+ ph.f.forEach((fl,j)=>{h+=`<label for="${tn}-${j}">${esc(fl[0])}</label>
+ <textarea id="${tn}-${j}" oninput="saveField('${tn}',${j},this.value)">${esc(ans[j]||"")}</textarea>
+ <div class="ex">Es: ${esc(fl[1])}</div>`;});return h;}
+function toggleForm(tn){g("f-"+tn).classList.toggle("open");}
+function openStamp(tn){openTarget=tn;render();}
+function cycle(tn){const o=["todo","doing","done"];current.status=current.status||{};current.status[tn]=o[(o.indexOf(current.status[tn]||"todo")+1)%3];persist();render();}
+function saveField(tn,j,v){current.answers=current.answers||{};current.answers[tn]=current.answers[tn]||{};current.answers[tn][j]=v;persist();}
+function setScad(v){current.scadenza=v;persist();}
+function persist(){const i=projects.findIndex(x=>x.id===current.id);if(i>=0)projects[i]=current;save(projects);}
+function backHome(){current=null;view="idee";render();}
+function dupProject(id){const src=projects.find(x=>x.id===id);if(!src)return;const c=JSON.parse(JSON.stringify(src));c.id="p"+Date.now();c.name=(src.name+" (copia)").slice(0,60);c.created=new Date().toLocaleDateString("it-IT");projects.unshift(c);save(projects);current=null;view="idee";render();}
+
+function similar(txt){txt=(txt||"").toLowerCase().trim();return projects.find(p=>(p.name||"").toLowerCase().trim()===txt || ((p.answers&&p.answers.T0&&p.answers.T0[0]||"").toLowerCase().trim()===txt));}
+function createProject(idea,tipo,vincoli,name){
+ const dup=similar(name)||similar(idea);
+ if(dup && !confirm("Esiste già un progetto simile: «"+dup.name+"». Crearne comunque uno nuovo?"))return null;
+ const p={id:"p"+Date.now(),name:(name||idea||"Nuova idea").slice(0,60),created:new Date().toLocaleDateString("it-IT"),
+  answers:{T0:{0:idea||"",1:tipo||"",2:vincoli||""}},status:{},scadenza:""};
+ projects.unshift(p);save(projects);return p;
+}
+function ideaLampo(){const v=(g("lampo").value||"").trim();if(!v){g("lampo").focus();return;}const p=createProject(v,"","",v);if(p){current=p;render();}}
+
+const QW=[["Qual è l'idea?","In una frase.",true],["Per chi è il progetto?","A2A o un cliente.",false],
+ ["Che tipo di progetto è?","Podcast, app, corso, evento…",false],["Fino a dove arriviamo?","Validazione / business model / piano completo.",false],
+ ["Vincoli (budget, tempi)?","«nessuno» se non ce ne sono.",false],["Nome breve del progetto","Per la cartella.",true]];
+function startWiz(){wiz={i:0,a:[]};render();}
+function wizardHTML(){const [qs,hint,req]=QW[wiz.i];const tot=QW.length;
+ return `<button class="btn-ghost btn-mini" onclick="cancelWiz()">✕ Annulla</button>
+ <div class="card wizard"><div class="step-label">Domanda ${wiz.i+1} di ${tot}</div>
+ <div class="bar"><span style="width:${(wiz.i+1)/tot*100}%"></span></div>
+ <div class="q">${qs}</div><p class="muted">${hint}</p>
+ <textarea id="wq" oninput="wiz.a[${wiz.i}]=this.value">${esc(wiz.a[wiz.i]||"")}</textarea>
+ <div class="foot"><button class="btn-ghost" ${wiz.i===0?'disabled':''} onclick="wizNav(-1)">← Indietro</button>
+ <button class="btn-primary" style="width:auto" onclick="wizNext(${req})">${wiz.i===tot-1?'Crea progetto ✓':'Avanti →'}</button></div></div>`;}
+function wizNav(d){wiz.i+=d;render();}
+function wizNext(req){const v=(wiz.a[wiz.i]||"").trim();if(req&&!v){alert("Questo campo è necessario per proseguire.");return;}
+ if(wiz.i<QW.length-1){wiz.i++;render();return;}
+ const p=createProject(wiz.a[0],wiz.a[2],wiz.a[4],wiz.a[5]||wiz.a[0]);wiz=null;if(p){current=p;}render();}
+function cancelWiz(){wiz=null;render();}
+
+function shareProject(){const p=current;let t="🏭 "+p.name+" — Fabbrica-Progetti\n";if(p.scadenza)t+="Scadenza: "+p.scadenza+"\n";t+="\n";
+ AREAS.forEach(([area,phs])=>{t+=area+"\n";phs.forEach(tn=>{const st=(p.status||{})[tn]||"todo";const a=(p.answers||{})[tn]||{};
+  t+="  "+tn+" "+PH[tn].n+" ["+(st==="done"?"fatto":st==="doing"?"in corso":"da fare")+"]\n";
+  PH[tn].f.forEach((fl,j)=>{if(a[j])t+="    - "+fl[0]+": "+a[j]+"\n";});});});
+ if(navigator.share){navigator.share({title:p.name,text:t}).catch(()=>{});}
+ else{const b=new Blob([t],{type:"text/plain"});const u=URL.createObjectURL(b);const link=document.createElement("a");link.href=u;link.download=p.name+".txt";link.click();}
+}
+
+/* Esporta / Importa (backup) */
+function exportAll(){const b=new Blob([JSON.stringify(projects,null,2)],{type:"application/json"});const u=URL.createObjectURL(b);const a=document.createElement("a");a.href=u;a.download="fabbrica-progetti-backup.json";a.click();}
+function importAll(input){const f=input.files[0];if(!f)return;const r=new FileReader();r.onload=e=>{try{const data=JSON.parse(e.target.result);if(!Array.isArray(data))throw 0;const ids=new Set(projects.map(p=>p.id));let n=0;data.forEach(p=>{if(p&&p.id&&!ids.has(p.id)){projects.push(p);n++;}});save(projects);alert("Importati "+n+" progetti.");render();}catch(err){alert("File non valido.");}};r.readAsText(f);input.value="";}
+
+function mappaHTML(){let h=`<div class="card"><div class="proj-name">🗺️ Come lavora la fabbrica</div>
+ <p class="muted">Da un'idea partono più agenti in parallelo: chi raccoglie, chi scrive, chi valuta. Pico coordina e parla con te e con Aria.</p></div>
+ <div class="area-h">Gli agenti</div>`;
+ AGENTS.forEach(([e,n,d])=>{h+=`<div class="card agent-card"><span class="avatar">${e}</span><div><strong>${n}</strong><div class="muted">${d}</div></div></div>`;});
+ h+=`<div class="area-h">Il flusso</div><div class="card muted"><strong>1.</strong> Innesco → <strong>2.</strong> Validazione (Mira+Argo+Lia in parallelo) → <strong>3.</strong> Concept → <strong>4.</strong> Numeri → <strong>5-6.</strong> Marketing+Ads (Ada) + Social (in parallelo) · <strong>7.</strong> Fondi (Fedra) → <strong>8.</strong> Kit → <strong>9.</strong> Misura.</div>`;
+ return h;}
+function infoHTML(){return `<div class="card"><div class="proj-name">ℹ️ Fabbrica-Progetti</div>
+ <p class="muted">Porta un'idea a progetto pronto al lancio ovunque tu sia — anche in coda al treno o prima del decollo. 9 aree, 22 fasi.</p>
+ <p class="muted"><strong>Ovunque e offline:</strong> aggiungi l'app alla Home; funziona anche senza rete.</p>
+ <p class="muted"><strong>Veloce:</strong> «Idea lampo» salva in 5 secondi; puoi dettare col microfono; ogni progetto ti dice la prossima azione e l'agente da attivare.</p></div>
+ <div class="card"><div class="proj-name">💾 Backup dei tuoi progetti</div>
+ <p class="muted">I progetti restano su questo dispositivo (memoria del browser: ${usagePct()}% di 5 MB usato). Per non perderli o per passarli a un altro telefono, esporta un file di backup e reimportalo dove vuoi. (Sincronizzazione cloud automatica: in arrivo — fase 2.)</p>
+ <div style="display:flex;gap:.6rem;flex-wrap:wrap;margin-top:.6rem">
+   <button class="btn-ghost" onclick="exportAll()">⬇️ Esporta backup</button>
+   <label class="btn-ghost" style="display:inline-block">⬆️ Importa backup<input type="file" accept="application/json" onchange="importAll(this)" style="display:none"></label>
+ </div></div>
+ <div class="card muted">AccessibilityToAll SRL · WCAG 2.1 AA · parte di «Base».</div>`;}
+
+if("serviceWorker" in navigator && location.protocol.indexOf("http")===0){window.addEventListener("load",function(){navigator.serviceWorker.register("fp-sw.js").catch(function(){});});}
+render();
+</script>
+</body>
+</html>
