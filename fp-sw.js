@@ -1,4 +1,4 @@
-const CACHE="fabbrica-progetti-v1";
+const CACHE="fabbrica-progetti-v2";
 const ASSETS=["./index.html","./fp-manifest.json","./fp-icon-180.png","./fp-icon-192.png","./fp-icon-512.png"];
 self.addEventListener("install",e=>{e.waitUntil(caches.open(CACHE).then(c=>c.addAll(ASSETS)).catch(()=>{}));self.skipWaiting();});
 self.addEventListener("activate",e=>{e.waitUntil(caches.keys().then(ks=>Promise.all(ks.filter(k=>k!==CACHE).map(k=>caches.delete(k)))));self.clients.claim();});
