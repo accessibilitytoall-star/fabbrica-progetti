@@ -60,7 +60,11 @@
   .lampo label{color:#3d2200;font-size:1rem;margin-top:0}.lampo textarea{border-color:#e79a4d}
   .warn{background:#fff3e0;border:1px solid #f2c98a;color:#9a5b00;border-radius:10px;padding:.6rem .8rem;margin:.6rem 0;font-size:.9rem}
   .scad{background:#fff;border:1px solid var(--bordo);border-left:5px solid var(--arancio);border-radius:10px;padding:.5rem .8rem;margin:.3rem 0;font-size:.9rem}
-  .scad.overdue{border-left-color:#c0392b;color:#9a3025}
+  .scad.overdue{border-left-color:#b35a00;border-left-width:8px;background:#fff3e0;color:#000}
+  .scad.overdue strong{color:#000}
+  .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+  .err{color:#000;background:#fff3e0;border-left:5px solid #b35a00;border-radius:8px;padding:.4rem .6rem;margin:.4rem 0 0;font-weight:700;font-size:.95rem}
+  .ctx{background:var(--chiaro);border-radius:8px;padding:.5rem .6rem;margin:.4rem 0;font-size:.9rem;color:var(--blu-notte)}
   a{color:var(--blu-scuro);font-weight:700}
   @media print{nav.tabs,header.app,.btn-ghost,.btn-primary,.chip{display:none!important}.wrap{padding:0}}
 </style>
@@ -69,10 +73,10 @@
 <header class="app"><h1>🏭 Fabbrica-Progetti</h1></header>
 <div class="wrap" id="main"></div>
 
-<nav class="tabs" role="tablist">
-  <button id="tab-idee" class="active" onclick="go('idee')">💡 Idee</button>
-  <button id="tab-mappa" onclick="go('mappa')">🗺️ Mappa</button>
-  <button id="tab-info" onclick="go('info')">ℹ️ Info</button>
+<nav class="tabs" aria-label="Sezioni dell'app">
+  <button id="tab-idee" class="active" aria-current="page" onclick="go('idee')"><span aria-hidden="true">💡</span> Idee</button>
+  <button id="tab-mappa" onclick="go('mappa')"><span aria-hidden="true">🗺️</span> Mappa</button>
+  <button id="tab-info" onclick="go('info')"><span aria-hidden="true">ℹ️</span> Info</button>
 </nav>
 
 <script>
@@ -82,7 +86,7 @@ const AREAS=[
  ["⑦ Ricerca fondi",["T13","T14","T15","T16"]],["⑧ Kit di lancio",["T17","T18","T19"]],["⑨ Misura",["T20"]]
 ];
 const PH={
- T0:{n:"Innesco",e:"🚦",ag:"Pico",f:[["Idea in una frase","un podcast che spiega l'accessibilità alle PMI"],["Tipo di progetto","podcast"],["Vincoli (budget, tempi)","budget contenuto, 1° episodio in 2 mesi"]]},
+ T0:{n:"Innesco",e:"🚦",ag:"Pico",f:[["Idea in una frase","un podcast che spiega l'accessibilità alle PMI"],["Tipo di progetto","podcast"],["Vincoli (budget, tempi)","budget contenuto, 1° episodio in 2 mesi"],["Per chi è","A2A o un cliente"],["Fin dove arrivare","validazione / business model / piano completo"]]},
  T1:{n:"Validazione",e:"✅",ag:"Pico",f:[["Problema e per chi","le PMI non capiscono gli obblighi EAA"],["Prove del bisogno","forum, ricerche in aumento"],["Verdetto","vale la pena / da rivedere / no"]]},
  T2:{n:"Analisi mercato",e:"📊",ag:"Mira",f:[["Grandezza e trend","4,4 mln PMI, in crescita"],["Pain point reali","«non so da dove iniziare»"]]},
  T3:{n:"Analisi competitor",e:"🕵️",ag:"Argo",f:[["Competitor + debolezza","Studio X: legale ma non pratico"],["Angolo di differenziazione","semplice e umano"]]},
@@ -117,7 +121,7 @@ const AGENTS=[
 const KEY="fabbrica_progetti_v2";
 function loadP(){try{return JSON.parse(localStorage.getItem(KEY))||[]}catch(e){return[]}}
 let quotaFull=false;
-function save(p){try{localStorage.setItem(KEY,JSON.stringify(p));quotaFull=false;}catch(e){quotaFull=true;alert("⚠️ Memoria piena. Vai in Info → «Esporta backup», poi archivia qualche progetto: l'ultima modifica potrebbe non essere stata salvata.");}}
+function save(p){try{localStorage.setItem(KEY,JSON.stringify(p));quotaFull=false;}catch(e){quotaFull=true;alert("⚠️ Memoria piena: l'ultima modifica potrebbe non essere stata salvata. Vai in Info e usa «Esporta backup» per avere una copia di tutti i progetti.");}}
 function usagePct(){try{return Math.min(100,Math.round((localStorage.getItem(KEY)||"").length/(5*1024*1024)*100));}catch(e){return 0;}}
 let projects=loadP();
 let view="idee", current=null, wiz=null, q="", openTarget=null;
@@ -129,30 +133,36 @@ function nextTn(p){for(const [a,phs] of AREAS){for(const tn of phs){if((p.status
 function nextLabel(p){const tn=nextTn(p);return tn?PH[tn].e+" "+tn+" · "+PH[tn].n+" (agente: "+PH[tn].ag+")":"🎉 Completato";}
 function daysTo(d){if(!d)return null;const ms=new Date(d+"T00:00:00")-new Date(new Date().toDateString());return Math.round(ms/86400000);}
 
-function go(v){view=v;current=null;wiz=null;["idee","mappa","info"].forEach(t=>g("tab-"+t).classList.toggle("active",t===v));render();}
+function go(v){view=v;current=null;wiz=null;["idee","mappa","info"].forEach(t=>{const b=g("tab-"+t);b.classList.toggle("active",t===v);if(t===v)b.setAttribute("aria-current","page");else b.removeAttribute("aria-current");});render();}
 function render(){const m=g("main");
  if(wiz!==null){m.innerHTML=wizardHTML();const w=g("wq");if(w)w.focus();return;}
- if(current){m.innerHTML=projectHTML(current);if(openTarget){const el=g("f-"+openTarget);if(el){el.classList.add("open");const ph=el.closest(".phase");if(ph){ph.classList.add("target");ph.scrollIntoView({block:"center"});}}openTarget=null;}return;}
+ if(current){m.innerHTML=projectHTML(current);if(openTarget){const el=g("f-"+openTarget);if(el){el.classList.add("open");const mb=g("m-"+openTarget);if(mb)mb.setAttribute("aria-expanded","true");const ph=el.closest(".phase");if(ph){ph.classList.add("target");ph.scrollIntoView({block:"center"});}}openTarget=null;}return;}
  if(view==="idee")m.innerHTML=ideeHTML();else if(view==="mappa")m.innerHTML=mappaHTML();else m.innerHTML=infoHTML();
 }
 
 function ideeHTML(){
  let h=`<div class="lampo"><label for="lampo">💡 Idea lampo (5 secondi)</label>
-  <textarea id="lampo" placeholder="Scrivi o detta l'idea… la sviluppi con calma dopo"></textarea>
+  <textarea id="lampo" placeholder="Scrivi o detta l'idea… la sviluppi con calma dopo" aria-describedby="lampo-err"></textarea>
+  <div id="lampo-err" role="alert"></div>
   <button class="btn-primary" style="margin-top:.5rem" onclick="ideaLampo()">Salva idea ⚡</button></div>
   <button class="btn-ghost" style="width:100%" onclick="startWiz()">＋ Nuova idea (wizard completo)</button>`;
- if(usagePct()>80)h+=`<div class="warn">⚠️ Memoria quasi piena (${usagePct()}%). Esporta un backup (Info) e archivia i progetti vecchi.</div>`;
+ if(usagePct()>80)h+=`<div class="warn" role="status">⚠️ Memoria quasi piena (${usagePct()}%). Vai in Info e usa «Esporta backup» per avere una copia di tutti i progetti.</div>`;
  // scadenze vicine
  const sc=projects.filter(p=>p.scadenza).map(p=>({p,d:daysTo(p.scadenza)})).filter(x=>x.d!==null&&x.d<=30).sort((a,b)=>a.d-b.d);
- if(sc.length){h+=`<div class="area-h">⏰ Scadenze vicine</div>`;sc.forEach(({p,d})=>{h+=`<div class="scad ${d<0?'overdue':''}">📌 ${esc(p.name)} — ${d<0?('in ritardo di '+(-d)+' gg'):(d===0?'oggi!':'tra '+d+' gg')} (${esc(p.scadenza)})</div>`;});}
+ if(sc.length){h+=`<div class="area-h">⏰ Scadenze vicine</div>`;sc.forEach(({p,d})=>{h+=`<div class="scad ${d<0?'overdue':''}">${d<0?'<strong><span aria-hidden="true">⚠️</span> In ritardo</strong> · ':'<span aria-hidden="true">📌</span> '}${esc(p.name)} — ${d<0?('in ritardo di '+(-d)+' gg'):(d===0?'oggi!':'tra '+d+' gg')} (${esc(p.scadenza)})</div>`;});}
  if(projects.length){const avg=Math.round(projects.reduce((s,p)=>s+progress(p),0)/projects.length);
   h+=`<div class="stats" style="margin-top:1rem"><div class="stat"><b>${projects.length}</b>progetti</div><div class="stat"><b>${avg}%</b>medio</div></div>`;
-  if(projects.length>3)h+=`<input type="search" placeholder="🔎 Cerca progetto…" value="${esc(q)}" oninput="q=this.value;render()" aria-label="Cerca progetto">`;
+  if(projects.length>3)h+=`<input type="search" id="cerca" placeholder="🔎 Cerca progetto…" value="${esc(q)}" oninput="cerca(this.value)" aria-label="Cerca progetto"><div id="cerca-esito" class="sr-only" role="status"></div>`;
  } else h+=`<p class="muted" style="margin-top:1rem">Nessun progetto ancora. Scrivi un'idea lampo per partire.</p>`;
- const list=projects.filter(p=>!q||(p.name+" "+((p.answers&&p.answers.T0&&p.answers.T0[0])||"")).toLowerCase().includes(q.toLowerCase()));
- list.forEach(p=>{const i=projects.indexOf(p);const pr=progress(p);
+ h+=`<div id="lista">${listaHTML()}</div>`;
+ return h;
+}
+function filtrati(){return projects.filter(p=>!q||(p.name+" "+((p.answers&&p.answers.T0&&p.answers.T0[0])||"")).toLowerCase().includes(q.toLowerCase()));}
+function cerca(v){q=v;const l=g("lista");if(l)l.innerHTML=listaHTML();const e=g("cerca-esito");if(e){const n=filtrati().length;e.textContent=n===1?"1 progetto trovato":n+" progetti trovati";}}
+function listaHTML(){let h="";
+ filtrati().forEach(p=>{const i=projects.indexOf(p);const pr=progress(p);
   h+=`<div class="card"><div class="proj-head"><span class="proj-name">🏭 ${esc(p.name)}</span>
-   <span><button class="btn-ghost btn-mini" onclick="dupProject('${p.id}')" title="Duplica">⧉</button> <button class="btn-ghost btn-mini" onclick="open_(${i})">Apri</button></span></div>
+   <span><button class="btn-ghost btn-mini" onclick="dupProject('${p.id}')" title="Duplica" aria-label="Duplica il progetto ${esc(p.name)}">⧉</button> <button class="btn-ghost btn-mini" onclick="open_(${i})" aria-label="Apri il progetto ${esc(p.name)}">Apri</button></span></div>
   <div class="bar"><span style="width:${pr}%"></span></div>
   <div class="next"><span>👉 Prossima: ${esc(nextLabel(p))}</span></div>
   <div class="muted">${pr}% · creato ${esc(p.created)}</div></div>`;});
@@ -163,17 +173,17 @@ function open_(i){current=projects[i];render();}
 function projectHTML(p){const pr=progress(p);const tn=nextTn(p);
  let h=`<button class="btn-ghost btn-mini" onclick="backHome()">← Idee</button>
  <div class="card"><div class="proj-head"><span class="proj-name">🏭 ${esc(p.name)}</span>
-   <span><button class="btn-ghost btn-mini" onclick="dupProject('${p.id}')" title="Duplica">⧉</button> <button class="btn-ghost btn-mini" onclick="shareProject()">📤</button> <button class="btn-ghost btn-mini" onclick="window.print()">🖨️</button></span></div>
+   <span><button class="btn-ghost btn-mini" onclick="dupProject('${p.id}')" title="Duplica" aria-label="Duplica il progetto">⧉</button> <button class="btn-ghost btn-mini" onclick="shareProject()" title="Condividi" aria-label="Condividi il progetto">📤</button> <button class="btn-ghost btn-mini" onclick="window.print()" title="Stampa" aria-label="Stampa il progetto">🖨️</button></span></div>
  <div class="bar"><span style="width:${pr}%"></span></div>
- <div class="next"><span>👉 Prossima: ${esc(nextLabel(p))}</span>${tn?`<button class="btn-ghost btn-mini" onclick="openStamp('${tn}')">Vai</button>`:''}</div>
+ <div class="next"><span>👉 Prossima: ${esc(nextLabel(p))}</span>${tn?`<button class="btn-ghost btn-mini" onclick="openStamp('${tn}')" aria-label="Vai alla fase ${PH[tn].n}">Vai</button>`:''}</div>
  <label for="scad">⏰ Scadenza (facoltativa)</label><input type="date" id="scad" value="${esc(p.scadenza||'')}" onchange="setScad(this.value)">
  <div class="muted" style="margin-top:.4rem">${pr}% completato</div></div>`;
  AREAS.forEach(([area,phs])=>{h+=`<div class="area-h">${area}</div>`;
   phs.forEach(tn=>{const ph=PH[tn];const st=(p.status||{})[tn]||"todo";
    h+=`<div class="phase"><div class="phase-top"><span class="tn">${tn}</span>
    <span class="t">${ph.e} ${ph.n}<div class="agent-tag">agente: ${ph.ag}</div></span>
-   <button class="chip ${st}" onclick="cycle('${tn}')">${st==='todo'?'da fare':st==='doing'?'in corso':'fatto'}</button>
-   <button class="btn-ghost btn-mini" onclick="toggleForm('${tn}')">✎</button></div>
+   <button class="chip ${st}" id="c-${tn}" onclick="cycle('${tn}')" aria-label="${ph.n}: ${st==='todo'?'da fare':st==='doing'?'in corso':'fatto'}. Premi per cambiare lo stato">${st==='todo'?'da fare':st==='doing'?'in corso':'fatto'}</button>
+   <button class="btn-ghost btn-mini" id="m-${tn}" onclick="toggleForm('${tn}')" aria-label="Scrivi nella fase ${ph.n}" aria-expanded="false" aria-controls="f-${tn}">✎</button></div>
    <div class="form" id="f-${tn}">${formHTML(p,tn)}</div></div>`;});
  });
  return h;
@@ -182,9 +192,9 @@ function formHTML(p,tn){const ph=PH[tn];const ans=(p.answers||{})[tn]||{};let h=
  ph.f.forEach((fl,j)=>{h+=`<label for="${tn}-${j}">${esc(fl[0])}</label>
  <textarea id="${tn}-${j}" oninput="saveField('${tn}',${j},this.value)">${esc(ans[j]||"")}</textarea>
  <div class="ex">Es: ${esc(fl[1])}</div>`;});return h;}
-function toggleForm(tn){g("f-"+tn).classList.toggle("open");}
+function toggleForm(tn){const o=g("f-"+tn).classList.toggle("open");const b=g("m-"+tn);if(b)b.setAttribute("aria-expanded",o?"true":"false");}
 function openStamp(tn){openTarget=tn;render();}
-function cycle(tn){const o=["todo","doing","done"];current.status=current.status||{};current.status[tn]=o[(o.indexOf(current.status[tn]||"todo")+1)%3];persist();render();}
+function cycle(tn){const o=["todo","doing","done"];current.status=current.status||{};current.status[tn]=o[(o.indexOf(current.status[tn]||"todo")+1)%3];persist();const y=window.scrollY;render();const c=g("c-"+tn);if(c){c.focus({preventScroll:true});window.scrollTo(0,y);}}
 function saveField(tn,j,v){current.answers=current.answers||{};current.answers[tn]=current.answers[tn]||{};current.answers[tn][j]=v;persist();}
 function setScad(v){current.scadenza=v;persist();}
 function persist(){const i=projects.findIndex(x=>x.id===current.id);if(i>=0)projects[i]=current;save(projects);}
@@ -192,14 +202,14 @@ function backHome(){current=null;view="idee";render();}
 function dupProject(id){const src=projects.find(x=>x.id===id);if(!src)return;const c=JSON.parse(JSON.stringify(src));c.id="p"+Date.now();c.name=(src.name+" (copia)").slice(0,60);c.created=new Date().toLocaleDateString("it-IT");projects.unshift(c);save(projects);current=null;view="idee";render();}
 
 function similar(txt){txt=(txt||"").toLowerCase().trim();return projects.find(p=>(p.name||"").toLowerCase().trim()===txt || ((p.answers&&p.answers.T0&&p.answers.T0[0]||"").toLowerCase().trim()===txt));}
-function createProject(idea,tipo,vincoli,name){
+function createProject(idea,tipo,vincoli,name,perChi,finDove){
  const dup=similar(name)||similar(idea);
  if(dup && !confirm("Esiste già un progetto simile: «"+dup.name+"». Crearne comunque uno nuovo?"))return null;
  const p={id:"p"+Date.now(),name:(name||idea||"Nuova idea").slice(0,60),created:new Date().toLocaleDateString("it-IT"),
-  answers:{T0:{0:idea||"",1:tipo||"",2:vincoli||""}},status:{},scadenza:""};
+  answers:{T0:{0:idea||"",1:tipo||"",2:vincoli||"",3:perChi||"",4:finDove||""}},status:{},scadenza:""};
  projects.unshift(p);save(projects);return p;
 }
-function ideaLampo(){const v=(g("lampo").value||"").trim();if(!v){g("lampo").focus();return;}const p=createProject(v,"","",v);if(p){current=p;render();}}
+function ideaLampo(){const v=(g("lampo").value||"").trim();if(!v){const e=g("lampo-err");e.className="err";e.textContent="Il campo è vuoto: scrivi almeno una parola per salvare l'idea.";g("lampo").setAttribute("aria-invalid","true");g("lampo").focus();return;}const p=createProject(v,"","",v);if(p){current=p;render();}}
 
 const QW=[["Qual è l'idea?","In una frase.",true],["Per chi è il progetto?","A2A o un cliente.",false],
  ["Che tipo di progetto è?","Podcast, app, corso, evento…",false],["Fino a dove arriviamo?","Validazione / business model / piano completo.",false],
@@ -209,14 +219,14 @@ function wizardHTML(){const [qs,hint,req]=QW[wiz.i];const tot=QW.length;
  return `<button class="btn-ghost btn-mini" onclick="cancelWiz()">✕ Annulla</button>
  <div class="card wizard"><div class="step-label">Domanda ${wiz.i+1} di ${tot}</div>
  <div class="bar"><span style="width:${(wiz.i+1)/tot*100}%"></span></div>
- <div class="q">${qs}</div><p class="muted">${hint}</p>
- <textarea id="wq" oninput="wiz.a[${wiz.i}]=this.value">${esc(wiz.a[wiz.i]||"")}</textarea>
+ <div class="q" id="wq-q">${qs}</div><p class="muted" id="wq-h">${hint}</p>
+ <textarea id="wq" aria-labelledby="wq-q" aria-describedby="wq-h" oninput="wiz.a[${wiz.i}]=this.value">${esc(wiz.a[wiz.i]||"")}</textarea>
  <div class="foot"><button class="btn-ghost" ${wiz.i===0?'disabled':''} onclick="wizNav(-1)">← Indietro</button>
  <button class="btn-primary" style="width:auto" onclick="wizNext(${req})">${wiz.i===tot-1?'Crea progetto ✓':'Avanti →'}</button></div></div>`;}
 function wizNav(d){wiz.i+=d;render();}
 function wizNext(req){const v=(wiz.a[wiz.i]||"").trim();if(req&&!v){alert("Questo campo è necessario per proseguire.");return;}
  if(wiz.i<QW.length-1){wiz.i++;render();return;}
- const p=createProject(wiz.a[0],wiz.a[2],wiz.a[4],wiz.a[5]||wiz.a[0]);wiz=null;if(p){current=p;}render();}
+ const p=createProject(wiz.a[0],wiz.a[2],wiz.a[4],wiz.a[5]||wiz.a[0],wiz.a[1],wiz.a[3]);wiz=null;if(p){current=p;}render();}
 function cancelWiz(){wiz=null;render();}
 
 function shareProject(){const p=current;let t="🏭 "+p.name+" — Fabbrica-Progetti\n";if(p.scadenza)t+="Scadenza: "+p.scadenza+"\n";t+="\n";
@@ -245,9 +255,10 @@ function infoHTML(){return `<div class="card"><div class="proj-name">ℹ️ Fabb
  <p class="muted">I progetti restano su questo dispositivo (memoria del browser: ${usagePct()}% di 5 MB usato). Per non perderli o per passarli a un altro telefono, esporta un file di backup e reimportalo dove vuoi. (Sincronizzazione cloud automatica: in arrivo — fase 2.)</p>
  <div style="display:flex;gap:.6rem;flex-wrap:wrap;margin-top:.6rem">
    <button class="btn-ghost" onclick="exportAll()">⬇️ Esporta backup</button>
-   <label class="btn-ghost" style="display:inline-block">⬆️ Importa backup<input type="file" accept="application/json" onchange="importAll(this)" style="display:none"></label>
+   <button class="btn-ghost" onclick="g('imp-file').click()">⬆️ Importa backup</button>
+   <input type="file" id="imp-file" class="sr-only" tabindex="-1" aria-hidden="true" accept="application/json,.json" onchange="importAll(this)">
  </div></div>
- <div class="card muted">AccessibilityToAll SRL · WCAG 2.1 AA · parte di «Base».</div>`;}
+ <div class="card muted">AccessibilityToAll SRL · WCAG 2.1 AA · parte di «Talismano».</div>`;}
 
 if("serviceWorker" in navigator && location.protocol.indexOf("http")===0){window.addEventListener("load",function(){navigator.serviceWorker.register("fp-sw.js").catch(function(){});});}
 render();
